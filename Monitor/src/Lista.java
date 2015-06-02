@@ -99,20 +99,35 @@ public class Lista {
 	}
 	
 	public synchronized Lista quicksort(){
+		//INV: como mínimo tengo 2 Threads
 		if(this.sizeList() <= 1){
+			this.setCantThreads(this.getCantThreads() + 1);
+			notifyAll();
 			return this;
 		}
 		int pivot = this.popList(0);
 		Lista left =  this.menoresA(pivot);
 		Lista right = this.mayoresA(pivot);
 		
-		Sorter sl = new Sorter(left);
-		sl.start();
-		//left = left.quicksort();
+		if(this.getCantThreads() > 0){
+			Sorter sl = new Sorter(left);
+			this.setCantThreads(this.getCantThreads() - 1);
+			sl.start();
+		}else{	
+			left = left.quicksort();
+		}
+		
+		while(this.getCantThreads() == 0){
+			try {
+				wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 		
 		Sorter sr = new Sorter(right);
+		this.setCantThreads(this.getCantThreads() - 1);
 		sr.start();
-		//right = right.quicksort();
 		
 		return concat(left, pivot, right);
 	}

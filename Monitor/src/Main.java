@@ -2,7 +2,7 @@
 public class Main {
 	
 	public static void main(String[] args) {
-		Lista lista = new Lista(5);
+		Lista lista = new Lista(3);
 		lista.add(100);
 		lista.add(10);
 		lista.add(30);
